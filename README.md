@@ -11,9 +11,9 @@ The following data is displayed on the overlay:
 
 **Kills and Deaths:** Your total kills and deaths during the fight, based on either built in KDR, kill messages in chat or loot piles
 
-**Average Tank Time:** The amount of time you tanked a pile for on average over all your deaths. Live tank time while being piled is displayed in ()
+**Average Tank Time:** The amount of time you tanked a pile for on average over all your deaths. Live tank time while being piled is displayed in ().
 
-**Average Return Time:** The average amount of time it took you to return to the fight. Live return time is displayed in (). Note: Will not display until you have at least one death.
+**Average Return Time:** The average amount of time it took you to return to the fight. Live return time is displayed in ().
 
 Displaying of all of these is configurable in the plugin settings:
 
