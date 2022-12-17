@@ -15,10 +15,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @PluginDescriptor(
@@ -55,6 +52,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private Integer endingKills = 0;
 	private int chatMessageKDR = 0;
 	private boolean usingRSKDR = true;
+	private boolean hasPVPKDRBeenSet = false;
 	private long lastTickMillis;
 	@Getter(AccessLevel.PACKAGE)
 	private Integer deaths = 0;
@@ -166,7 +164,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		}
 
 		if (event.getVarbitId() == Varbits.SHOW_PVP_KDR_STATS) { // edge case someone toggles KDR
-			if (client.getVarbitValue(Varbits.SHOW_PVP_KDR_STATS) == 0) {
+			if (client.getVarbitValue(Varbits.SHOW_PVP_KDR_STATS) == 0 || nonRegularWorld(client.getWorldType())) {
 				usingRSKDR = false;
 			} else {
 				usingRSKDR = true;
@@ -176,23 +174,28 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event) {
-		// if someone logs out. disconnects or is hopping, stop dps timer
+		// if someone logs out, disconnects or is hopping, stop dps timer
 		if (client.getGameState() == GameState.LOGIN_SCREEN
 				|| client.getGameState() == GameState.CONNECTION_LOST || client.getGameState() == GameState.HOPPING) {
-			if (shouldStartDPS) { // this won't be true until we start combat at least once
+			if (shouldStartDPS) { // this won't be true until we start combat at least once, so gets around any issues at first time login screen
 				userDPS.pause();
 			}
 		}
 		// in game KDR is the best way to track a users kills/deaths, determine if user has it enabled when they log in
-		if (client.getGameState() == GameState.LOGGED_IN && client.getVarbitValue(Varbits.SHOW_PVP_KDR_STATS) == 0) {
+		if (client.getGameState() == GameState.LOGGED_IN && client.getVarbitValue(Varbits.SHOW_PVP_KDR_STATS) == 0 || nonRegularWorld(client.getWorldType())) {
 			usingRSKDR = false;
 		} else {
 			usingRSKDR = true;
-			if (client.getWorldType().contains((WorldType.PVP))) { // reset kdr if someone goes to a pvp world, as pvp worlds have their own
-				startingKills = 0;
-				endingKills = 0;
-			}
 		}
+	}
+
+	private boolean nonRegularWorld(EnumSet<WorldType> worldType){
+		// All of these world types track KDR separately so just use kill messages on those to avoid any issues
+		if(worldType.contains(WorldType.PVP) || worldType.contains(WorldType.BOUNTY) || worldType.contains(WorldType.HIGH_RISK)
+		|| worldType.contains(WorldType.DEADMAN) || worldType.contains(WorldType.SEASONAL) || worldType.contains(WorldType.TOURNAMENT_WORLD)){
+			return true;
+		}
+		return false;
 	}
 
 	@Subscribe
