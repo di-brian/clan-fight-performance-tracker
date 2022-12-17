@@ -94,7 +94,6 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		// we're being hit, should we start tank timer?
 		if (actor == (Actor) client.getLocalPlayer()) {
-			shouldStartDPS = true;
 			hitsplatCount++;
 			// 4 or more hits on us, start it
 			if (hitsplatCount >= 4 && tankStartTick == 0) {
