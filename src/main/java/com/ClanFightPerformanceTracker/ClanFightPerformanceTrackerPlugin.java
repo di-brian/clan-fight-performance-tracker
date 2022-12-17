@@ -52,7 +52,6 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private Integer endingKills = 0;
 	private int chatMessageKDR = 0;
 	private boolean usingRSKDR = true;
-	private boolean hasPVPKDRBeenSet = false;
 	private long lastTickMillis;
 	@Getter(AccessLevel.PACKAGE)
 	private Integer deaths = 0;
