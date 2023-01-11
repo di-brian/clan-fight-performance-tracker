@@ -68,6 +68,8 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private int returnStartTick = 0;
 	@Getter(AccessLevel.PACKAGE)
 	private String averageReturnTime = "NA";
+	@Getter(AccessLevel.PACKAGE)
+	private int maxHits;
 
 	@Provides
 	ClanFightPerformanceTrackerConfig provideConfig(ConfigManager configManager) {
@@ -106,6 +108,9 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		Hitsplat hitsplat = hitsplatApplied.getHitsplat();
 		if (hitsplat.isMine()) { // hits are ours, add to DPS
+			if(hitsplat.getHitsplatType() == HitsplatID.DAMAGE_MAX_ME){
+				maxHits++;
+			}
 			shouldStartDPS = true;
 			int hit = hitsplat.getAmount();
 			userDPS.addDamage(hit);

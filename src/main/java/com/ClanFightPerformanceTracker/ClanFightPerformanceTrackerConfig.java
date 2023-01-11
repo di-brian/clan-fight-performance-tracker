@@ -30,4 +30,9 @@ public interface ClanFightPerformanceTrackerConfig extends Config {
 	default boolean showReturnTime() {
 		return true;
 	}
+
+	@ConfigItem(position = 6, keyName = "showMaxTime", name = "Show amount of max hits", description = "Display amount of max hits")
+	default boolean showMaxHits() {
+		return true;
+	}
 }

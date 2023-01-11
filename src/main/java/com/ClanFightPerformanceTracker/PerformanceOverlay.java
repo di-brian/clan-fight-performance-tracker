@@ -77,6 +77,11 @@ public class PerformanceOverlay extends OverlayPanel {
 						.right(plugin.getAverageReturnTime() + " (" + plugin.lastReturnTime + ")").build());
 			}
 		}
+		if (this.config.showMaxHits()) {
+			panelComponent.getChildren().add(LineComponent.builder()
+					.left("Max hits: ")
+					.right(String.valueOf(plugin.getMaxHits())).build());
+		}
 		return super.render(graphics);
 	}
 }
