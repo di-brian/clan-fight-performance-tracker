@@ -53,6 +53,11 @@ public class PerformanceOverlay extends OverlayPanel {
 					.left("Kills: " + plugin.getKillCount())
 					.right(" Deaths: " + plugin.getDeaths()).build());
 		}
+		if (this.config.showSnares() && this.plugin.isRegularSpellbook()) {
+			panelComponent.getChildren().add(LineComponent.builder()
+					.left("Snares: ")
+					.right(plugin.getSuccessfulSnares() + " / " + plugin.getSnares()).build());
+		}
 		if (this.config.showTankTime()) {
 			if (plugin.tanking) {
 				String tankTime = String.valueOf(plugin.getTimer(plugin.tankStartTime));

@@ -35,4 +35,9 @@ public interface ClanFightPerformanceTrackerConfig extends Config {
 	default boolean showMaxHits() {
 		return true;
 	}
+
+	@ConfigItem(position = 7, keyName = "showSnareCounter", name = "Show number of successful snares", description = "Display number of successful snares")
+	default boolean showSnares() {
+		return true;
+	}
 }
