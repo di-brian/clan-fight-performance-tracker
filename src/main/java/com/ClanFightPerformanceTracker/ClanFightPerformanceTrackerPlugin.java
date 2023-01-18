@@ -70,6 +70,13 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private String averageReturnTime = "NA";
 	@Getter(AccessLevel.PACKAGE)
 	private int maxHits;
+	private int snareTick = 0;
+	@Getter(AccessLevel.PACKAGE)
+	private int snares = 0;
+	@Getter(AccessLevel.PACKAGE)
+	private int successfulSnares = 0;
+	private int previousExpGained;
+	private final Map<Skill, Integer> previousSkillExpTable = new EnumMap<>(Skill.class);
 
 	@Provides
 	ClanFightPerformanceTrackerConfig provideConfig(ConfigManager configManager) {
@@ -117,8 +124,33 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 			if (userDPS.isPaused()) {
 				userDPS.unpause();
 			}
+			if (snareTick != 0 && hit < 3 && client.getTickCount() < snareTick + 5 && !isMembersWorld()) {
+				snares++;
+				successfulSnares++;
+
+				// reset snare check
+				snareTick = 0;
+			} else if (snareTick != 0 && hit > 2) {
+				snareTick = 0;
+			}
 		}
 	}
+
+	@Subscribe
+	public void onStatChanged(StatChanged statChanged)
+	{
+		final Skill skill = statChanged.getSkill();
+		final int xp = statChanged.getXp();
+
+		Integer previous = previousSkillExpTable.put(skill, xp);
+		if (skill == Skill.MAGIC) {
+			int xpChange = xp - previous;
+			if (59 < xpChange && xpChange < 66 && !isMembersWorld()) {
+				snareTick = client.getTickCount();
+			}
+		}
+	}
+
 
 	@Subscribe
 	public void onChatMessage(ChatMessage event) {
@@ -150,6 +182,12 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 			}
 			tankStartTick = 0;
 			tanking = false;
+		}
+
+		// Checking the tick before the next mage attack tick - for failed snares (no hitsplat)
+		if (client.getTickCount() == snareTick + 4 && !isMembersWorld()) {
+			snares++;
+			snareTick = 0;
 		}
 
 		if (usingRSKDR) {
@@ -191,6 +229,14 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		} else {
 			usingRSKDR = true;
 		}
+	}
+
+	public boolean isMembersWorld() {
+		EnumSet<WorldType> worldType = client.getWorldType();
+		if (worldType.contains(WorldType.MEMBERS)) {
+			return true;
+		}
+		return false;
 	}
 
 	private boolean nonRegularWorld(EnumSet<WorldType> worldType){
