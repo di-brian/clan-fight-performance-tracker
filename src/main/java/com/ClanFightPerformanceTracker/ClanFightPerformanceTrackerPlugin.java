@@ -83,9 +83,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		return (ClanFightPerformanceTrackerConfig) configManager.getConfig(ClanFightPerformanceTrackerConfig.class);
 	}
 
-	protected void startUp() {
-		this.overlayManager.add(this.overlay);
-	}
+	protected void startUp() { this.overlayManager.add(this.overlay); }
 
 	protected void shutDown() {
 		this.overlayManager.remove(this.overlay);
@@ -185,7 +183,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		}
 
 		// Checking the tick before the next mage attack tick - for failed snares (no hitsplat)
-		if (client.getTickCount() == snareTick + 4 && !isMembersWorld()) {
+		if (snareTick != 0 && client.getTickCount() == snareTick + 4 && !isMembersWorld()) {
 			snares++;
 			snareTick = 0;
 		}
