@@ -53,7 +53,7 @@ public class PerformanceOverlay extends OverlayPanel {
 					.left("Kills: " + plugin.getKillCount())
 					.right(" Deaths: " + plugin.getDeaths()).build());
 		}
-		if (this.config.showSnares() && !this.plugin.isMembersWorld()) {
+		if (this.config.showSnares() && this.plugin.isRegularSpellbook()) {
 			panelComponent.getChildren().add(LineComponent.builder()
 					.left("Snares: ")
 					.right(plugin.getSuccessfulSnares() + " / " + plugin.getSnares()).build());

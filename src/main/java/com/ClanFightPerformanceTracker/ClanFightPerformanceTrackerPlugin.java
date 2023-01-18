@@ -122,7 +122,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 			if (userDPS.isPaused()) {
 				userDPS.unpause();
 			}
-			if (snareTick != 0 && hit < 3 && client.getTickCount() < snareTick + 5 && !isMembersWorld()) {
+			if (snareTick != 0 && hit < 3 && client.getTickCount() < snareTick + 5 && isRegularSpellbook()) {
 				snares++;
 				successfulSnares++;
 
@@ -143,7 +143,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		Integer previous = previousSkillExpTable.put(skill, xp);
 		if (skill == Skill.MAGIC) {
 			int xpChange = xp - previous;
-			if (59 < xpChange && xpChange < 66 && !isMembersWorld()) {
+			if (59 < xpChange && xpChange < 66 && isRegularSpellbook()) {
 				snareTick = client.getTickCount();
 			}
 		}
@@ -183,7 +183,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		}
 
 		// Checking the tick before the next mage attack tick - for failed snares (no hitsplat)
-		if (snareTick != 0 && client.getTickCount() == snareTick + 4 && !isMembersWorld()) {
+		if (snareTick != 0 && client.getTickCount() == snareTick + 4 && isRegularSpellbook()) {
 			snares++;
 			snareTick = 0;
 		}
@@ -229,12 +229,8 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		}
 	}
 
-	public boolean isMembersWorld() {
-		EnumSet<WorldType> worldType = client.getWorldType();
-		if (worldType.contains(WorldType.MEMBERS)) {
-			return true;
-		}
-		return false;
+	public boolean isRegularSpellbook() {
+		return client.getVarbitValue(4070) == 0;
 	}
 
 	private boolean nonRegularWorld(EnumSet<WorldType> worldType){
