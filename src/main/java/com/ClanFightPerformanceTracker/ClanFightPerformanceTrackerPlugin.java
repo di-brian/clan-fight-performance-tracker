@@ -247,8 +247,6 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 				// pvp world fights might not be in wilderness
 				if(client.getVarbitValue(Varbits.MULTICOMBAT_AREA) == 0){
 					return; // if you aren't in multi you aren't back
-				} else if (client.getLocalPlayer().getSkullIcon() == null) {
-					return;
 				}
 			}
 			for (Player player : client.getPlayers()) {
