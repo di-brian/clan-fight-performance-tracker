@@ -11,7 +11,7 @@ The following data is displayed on the overlay:
 
 **Kills and Deaths:** Your total kills and deaths during the fight, based on either built in KDR, kill messages in chat or loot piles
 
-**Snares:** The total amount of snares thrown and the amount that were successful. Will only display with regular prayer book selected
+**Snares:** The total amount of snares thrown and the amount that were successful. Will only display when user is on regular spellbook
 
 **Average Tank Time:** The amount of time you tanked a pile for on average over all your deaths. Live tank time while being piled is displayed in ()
 
