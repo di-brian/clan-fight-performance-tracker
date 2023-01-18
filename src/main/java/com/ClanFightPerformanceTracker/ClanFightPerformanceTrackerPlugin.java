@@ -280,10 +280,10 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		// calculate how long it took us to get back to the fight
 		int localClanMembersCount = 0;
 		if (returning && client.getTickCount() > returnStartTick + 9) { // takes a few ticks to de-spawn after death
-			if (!client.getWorldType().contains(WorldType.PVP) || !client.getWorldType().contains(WorldType.HIGH_RISK) && client.getVarbitValue(Varbits.IN_WILDERNESS) == 0) {
+			if (!client.getWorldType().contains(WorldType.PVP) && client.getVarbitValue(Varbits.IN_WILDERNESS) == 0) {
 				return; // if you aren't in wilderness on a regular world you aren't back at the fight
 			}
-			if (client.getWorldType().contains(WorldType.PVP) || client.getWorldType().contains(WorldType.HIGH_RISK)) {
+			if (client.getWorldType().contains(WorldType.PVP)) {
 				// pvp world fights might not be in wilderness
 				if(client.getVarbitValue(Varbits.MULTICOMBAT_AREA) == 0){
 					return; // if you aren't in multi you aren't back
