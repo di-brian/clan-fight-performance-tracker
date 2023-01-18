@@ -46,13 +46,11 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private PerformanceOverlay overlay;
 	@Inject
 	private ClanFightPerformanceTrackerConfig config;
-	private String username = "";
 	private Integer lootKills = 0;
 	private Integer startingKills = 0;
 	private Integer endingKills = 0;
 	private int chatMessageKDR = 0;
 	private boolean usingRSKDR = true;
-	private long lastTickMillis;
 	@Getter(AccessLevel.PACKAGE)
 	private Integer deaths = 0;
 	long tankStartTime = 0;
@@ -69,13 +67,12 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	@Getter(AccessLevel.PACKAGE)
 	private String averageReturnTime = "NA";
 	@Getter(AccessLevel.PACKAGE)
-	private int maxHits;
+	private int maxHits = 0;
 	private int snareTick = 0;
 	@Getter(AccessLevel.PACKAGE)
 	private int snares = 0;
 	@Getter(AccessLevel.PACKAGE)
 	private int successfulSnares = 0;
-	private int previousExpGained;
 	private final Map<Skill, Integer> previousSkillExpTable = new EnumMap<>(Skill.class);
 
 	@Provides
@@ -86,7 +83,36 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	protected void startUp() { this.overlayManager.add(this.overlay); }
 
 	protected void shutDown() {
+		reset();
 		this.overlayManager.remove(this.overlay);
+	}
+
+	public void reset(){
+		lootKills = 0;
+		startingKills = 0;
+		endingKills = 0;
+		chatMessageKDR = 0;
+		usingRSKDR = true;
+		deaths = 0;
+		tankStartTime = 0;
+		lastTankTime = "NA";
+		tankTimes.clear();
+		hitsplatCount = 0;
+		tankStartTick = 0;
+		averageTankTime = "NA";
+		returnTimes.clear();
+		returnStartTime = 0;
+		lastReturnTime = "NA";
+		returnStartTick = 0;
+		averageReturnTime = "NA";
+		maxHits = 0;
+		snareTick = 0;
+		snares = 0;
+		successfulSnares = 0;
+		userDPS.reset();
+		returning = false;
+		tanking = false;
+		shouldStartDPS = false;
 	}
 
 	@Subscribe
@@ -165,7 +191,6 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 	@Subscribe
 	public void onGameTick(GameTick event) {
-		lastTickMillis = System.currentTimeMillis();
 
 		int hp = client.getLocalPlayer().getHealthRatio();
 

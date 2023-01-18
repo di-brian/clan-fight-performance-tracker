@@ -24,3 +24,5 @@ The following data is displayed on the overlay:
 Displaying of all of these is configurable in the plugin settings:
 
 ![alt text](https://i.imgur.com/12AvB3K.png)
+
+Turning the plugin off and back on will reset all data
