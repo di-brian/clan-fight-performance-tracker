@@ -58,6 +58,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private List<Integer> tankTimes = new LinkedList<Integer>();
 	private int hitsplatCount = 0;
 	private int tankStartTick = 0;
+	private int firstHitTick = 0;
 	@Getter(AccessLevel.PACKAGE)
 	private String averageTankTime = "NA";
 	private List<Integer> returnTimes = new LinkedList<Integer>();
@@ -124,9 +125,19 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		// we're being hit, should we start tank timer?
 		if (actor == (Actor) client.getLocalPlayer()) {
+			//TODO consider CWA
+			if (!client.getWorldType().contains(WorldType.PVP) && client.getVarbitValue(Varbits.IN_WILDERNESS) == 0) {
+				return; // if you aren't in wilderness on a regular world don't count the hits
+			}
+			if(client.getVarbitValue(Varbits.MULTICOMBAT_AREA) == 0){
+				return; // if you aren't in multi you aren't tanking i.e 1vs1 isn't tanking
+			}
+			if(hitsplatCount == 0){
+				firstHitTick = client.getTickCount();
+			}
 			hitsplatCount++;
 			// 4 or more hits on us, start it
-			if (hitsplatCount >= 4 && tankStartTick == 0) {
+			if (hitsplatCount >= 4 && tankStartTick == 0 && firstHitTick + 4 >= client.getTickCount()) {
 				tankStartTick = client.getTickCount();
 				tankStartTime = System.currentTimeMillis();
 				tanking = true;
