@@ -89,10 +89,9 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 	public void reset(){
 		lootKills = 0;
-		startingKills = 0;
+		startingKills = endingKills;
 		endingKills = 0;
 		chatMessageKDR = 0;
-		usingRSKDR = true;
 		deaths = 0;
 		tankStartTime = 0;
 		lastTankTime = "NA";
