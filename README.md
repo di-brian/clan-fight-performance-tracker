@@ -3,11 +3,13 @@ Clan fight performance tracker is a plugin that displays an overlay with some st
 
 The following data is displayed on the overlay:
 
-![alt text](https://i.imgur.com/KFZJgFt.png)
+![alt text](https://i.imgur.com/x1JoKdD.png)
 
 **DPS:** Damage per second done by you
 
-**Total Damage:** The total damage you've done
+**Damage Dealt:** The total damage you've dealt
+
+**Damage Taken:** The total damage you've taken
 
 **Kills and Deaths:** Your total kills and deaths during the fight, based on either built in KDR, kill messages in chat or loot piles
 
@@ -23,6 +25,6 @@ The following data is displayed on the overlay:
 
 Displaying of all of these is configurable in the plugin settings:
 
-![alt text](https://i.imgur.com/12AvB3K.png)
+![alt text](https://i.imgur.com/rCbZclv.png)
 
 Turning the plugin off and back on will reset all data

@@ -53,6 +53,8 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private boolean usingRSKDR = true;
 	@Getter(AccessLevel.PACKAGE)
 	private Integer deaths = 0;
+	@Getter(AccessLevel.PACKAGE)
+	private Integer damageTaken = 0;
 	long tankStartTime = 0;
 	String lastTankTime = "NA";
 	private List<Integer> tankTimes = new LinkedList<Integer>();
@@ -93,6 +95,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		endingKills = 0;
 		chatMessageKDR = 0;
 		deaths = 0;
+		damageTaken = 0;
 		tankStartTime = 0;
 		lastTankTime = "NA";
 		tankTimes.clear();
@@ -123,6 +126,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		// we're being hit, should we start tank timer?
 		if (actor == (Actor) client.getLocalPlayer()) {
+			damageTaken += hitsplatApplied.getHitsplat().getAmount();
 			hitsplatCount++;
 			// 4 or more hits on us, start it
 			if (hitsplatCount >= 4 && tankStartTick == 0) {
