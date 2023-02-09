@@ -1,5 +1,6 @@
 package com.ClanFightPerformanceTracker;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import net.runelite.client.events.PlayerLootReceived;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.inject.Inject;
 import java.text.DecimalFormat;
@@ -60,6 +62,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private List<Integer> tankTimes = new LinkedList<Integer>();
 	private int hitsplatCount = 0;
 	private int tankStartTick = 0;
+	private int interactingCount = 0;
 	@Getter(AccessLevel.PACKAGE)
 	private String averageTankTime = "NA";
 	private List<Integer> returnTimes = new LinkedList<Integer>();
@@ -76,6 +79,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	@Getter(AccessLevel.PACKAGE)
 	private int successfulSnares = 0;
 	private final Map<Skill, Integer> previousSkillExpTable = new EnumMap<>(Skill.class);
+	private static final Set<Integer> CLAN_WARS_ARENAS = ImmutableSet.of(13130,13131,13386,13387,12621,12622,12623,13647,13646,13645,13644,13133,13134,13135,13643,13642,13641,13898);
 
 	@Provides
 	ClanFightPerformanceTrackerConfig provideConfig(ConfigManager configManager) {
@@ -92,7 +96,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	public void reset(){
 		lootKills = 0;
 		startingKills = endingKills;
-		endingKills = 0;
+		endingKills = startingKills;
 		chatMessageKDR = 0;
 		deaths = 0;
 		damageTaken = 0;
@@ -126,10 +130,16 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		// we're being hit, should we start tank timer?
 		if (actor == (Actor) client.getLocalPlayer()) {
+			if (!client.getWorldType().contains(WorldType.PVP) && client.getVarbitValue(Varbits.IN_WILDERNESS) == 0 && !isAtCWA()) {
+				return; // if you aren't in wilderness on a regular world or CWA don't count the hits
+			}
+			if(client.getVarbitValue(Varbits.MULTICOMBAT_AREA) == 0){
+				return; // if you aren't in multi you aren't tanking i.e 1vs1 isn't tanking
+			}
 			damageTaken += hitsplatApplied.getHitsplat().getAmount();
 			hitsplatCount++;
-			// 4 or more hits on us, start it
-			if (hitsplatCount >= 4 && tankStartTick == 0) {
+			// 4 or more people are hitting us, this means we're getting piled and "tanking"
+			if (hitsplatCount >= 4 && tankStartTick == 0 && interactingCount >= 3) {
 				tankStartTick = client.getTickCount();
 				tankStartTime = System.currentTimeMillis();
 				tanking = true;
@@ -164,6 +174,12 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	}
 
 	@Subscribe
+	public void onInteractingChanged(InteractingChanged interactingChanged){
+		if(interactingChanged.getTarget() == client.getLocalPlayer() && interactingChanged.getSource() instanceof Player)
+			interactingCount++;
+	}
+
+	@Subscribe
 	public void onStatChanged(StatChanged statChanged)
 	{
 		final Skill skill = statChanged.getSkill();
@@ -177,7 +193,6 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 			}
 		}
 	}
-
 
 	@Subscribe
 	public void onChatMessage(ChatMessage event) {
@@ -199,8 +214,9 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		if (hp == -1) {
 			hitsplatCount = 0; // no hp bar up means we aren't getting hit anymore
+			interactingCount = 0; // we don't care about people interacting if they aren't hitting us, no hp bar means they aren't hitting
 			if (tankStartTick != 0) {
-				// we died, now how long did we tank for?
+				// we died or tanked off, now how long did we tank for?
 				int tankTime = client.getTickCount() - tankStartTick;
 				lastTankTime = String.valueOf(getTimer(tankStartTime));
 				tankTimes.add(tankTime);
@@ -266,6 +282,21 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		if(worldType.contains(WorldType.PVP) || worldType.contains(WorldType.BOUNTY) || worldType.contains(WorldType.HIGH_RISK)
 		|| worldType.contains(WorldType.DEADMAN) || worldType.contains(WorldType.SEASONAL) || worldType.contains(WorldType.TOURNAMENT_WORLD)){
 			return true;
+		}
+		return false;
+	}
+
+
+	public boolean isAtCWA()
+	{
+		final int[] mapRegions = client.getMapRegions();
+
+		for (int region : CLAN_WARS_ARENAS)
+		{
+			if (ArrayUtils.contains(mapRegions, region))
+			{
+				return true;
+			}
 		}
 		return false;
 	}
