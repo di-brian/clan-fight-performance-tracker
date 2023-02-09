@@ -62,7 +62,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private List<Integer> tankTimes = new LinkedList<Integer>();
 	private int hitsplatCount = 0;
 	private int tankStartTick = 0;
-	private int firstHitTick = 0;
+	private int interactingCount = 0;
 	@Getter(AccessLevel.PACKAGE)
 	private String averageTankTime = "NA";
 	private List<Integer> returnTimes = new LinkedList<Integer>();
@@ -79,7 +79,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	@Getter(AccessLevel.PACKAGE)
 	private int successfulSnares = 0;
 	private final Map<Skill, Integer> previousSkillExpTable = new EnumMap<>(Skill.class);
-	private static final Set<Integer> CLAN_WARS_ARENAS = ImmutableSet.of(12621,12622,12623,13647,13646,13645,13644,13133,13134,13135,13643,13642,13641,13898);
+	private static final Set<Integer> CLAN_WARS_ARENAS = ImmutableSet.of(13130,13131,13386,13387,12621,12622,12623,13647,13646,13645,13644,13133,13134,13135,13643,13642,13641,13898);
 
 	@Provides
 	ClanFightPerformanceTrackerConfig provideConfig(ConfigManager configManager) {
@@ -96,7 +96,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	public void reset(){
 		lootKills = 0;
 		startingKills = endingKills;
-		endingKills = 0;
+		endingKills = startingKills;
 		chatMessageKDR = 0;
 		deaths = 0;
 		damageTaken = 0;
@@ -136,13 +136,10 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 			if(client.getVarbitValue(Varbits.MULTICOMBAT_AREA) == 0){
 				return; // if you aren't in multi you aren't tanking i.e 1vs1 isn't tanking
 			}
-			if(hitsplatCount == 0){
-				firstHitTick = client.getTickCount();
-			}
 			damageTaken += hitsplatApplied.getHitsplat().getAmount();
 			hitsplatCount++;
 			// 4 or more hits on us, start it
-			if (hitsplatCount >= 4 && tankStartTick == 0 && firstHitTick + 4 >= client.getTickCount()) {
+			if (hitsplatCount >= 4 && tankStartTick == 0 && interactingCount >= 3) {
 				tankStartTick = client.getTickCount();
 				tankStartTime = System.currentTimeMillis();
 				tanking = true;
@@ -177,6 +174,12 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	}
 
 	@Subscribe
+	public void onInteractingChanged(InteractingChanged interactingChanged){
+		if(interactingChanged.getTarget() == client.getLocalPlayer() && interactingChanged.getSource() instanceof Player)
+			interactingCount++;
+	}
+
+	@Subscribe
 	public void onStatChanged(StatChanged statChanged)
 	{
 		final Skill skill = statChanged.getSkill();
@@ -190,7 +193,6 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 			}
 		}
 	}
-
 
 	@Subscribe
 	public void onChatMessage(ChatMessage event) {
@@ -212,8 +214,9 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		if (hp == -1) {
 			hitsplatCount = 0; // no hp bar up means we aren't getting hit anymore
+			interactingCount = 0;
 			if (tankStartTick != 0) {
-				// we died, now how long did we tank for?
+				// we died or tanked off, now how long did we tank for?
 				int tankTime = client.getTickCount() - tankStartTick;
 				lastTankTime = String.valueOf(getTimer(tankStartTime));
 				tankTimes.add(tankTime);
