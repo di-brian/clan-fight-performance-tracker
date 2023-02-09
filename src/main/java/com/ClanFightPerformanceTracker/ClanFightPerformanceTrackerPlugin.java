@@ -138,7 +138,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 			}
 			damageTaken += hitsplatApplied.getHitsplat().getAmount();
 			hitsplatCount++;
-			// 4 or more hits on us, start it
+			// 4 or more people are hitting us, this means we're getting piled and "tanking"
 			if (hitsplatCount >= 4 && tankStartTick == 0 && interactingCount >= 3) {
 				tankStartTick = client.getTickCount();
 				tankStartTime = System.currentTimeMillis();
@@ -214,7 +214,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 
 		if (hp == -1) {
 			hitsplatCount = 0; // no hp bar up means we aren't getting hit anymore
-			interactingCount = 0;
+			interactingCount = 0; // we don't care about people interacting if they aren't hitting us, no hp bar means they aren't hitting
 			if (tankStartTick != 0) {
 				// we died or tanked off, now how long did we tank for?
 				int tankTime = client.getTickCount() - tankStartTick;
