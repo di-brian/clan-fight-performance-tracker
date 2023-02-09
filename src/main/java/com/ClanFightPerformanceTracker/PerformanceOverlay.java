@@ -43,10 +43,15 @@ public class PerformanceOverlay extends OverlayPanel {
 					.left("DPS:")
 					.right(DPS_FORMAT.format(plugin.getUserDPS().getDps())).build());
 		}
-		if (this.config.showTotalDamage()) {
+		if (this.config.showDamageDealt()) {
 			panelComponent.getChildren().add(LineComponent.builder()
-					.left("Total Damage:")
+					.left("Damage Dealt:")
 					.right(String.valueOf(plugin.getUserDPS().getDamage())).build());
+		}
+		if (this.config.showDamageTaken()) {
+			panelComponent.getChildren().add(LineComponent.builder()
+					.left("Damage Taken:")
+					.right(String.valueOf(plugin.getDamageTaken())).build());
 		}
 		if (this.config.showKDR()) {
 			panelComponent.getChildren().add(LineComponent.builder()
