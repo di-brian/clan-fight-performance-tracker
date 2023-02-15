@@ -53,6 +53,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 	private Integer endingKills = 0;
 	private int chatMessageKDR = 0;
 	private boolean usingRSKDR = true;
+	private boolean startingSet = false;
 	@Getter(AccessLevel.PACKAGE)
 	private Integer deaths = 0;
 	@Getter(AccessLevel.PACKAGE)
@@ -97,6 +98,7 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 		lootKills = 0;
 		startingKills = endingKills;
 		endingKills = startingKills;
+		startingSet = false;
 		chatMessageKDR = 0;
 		deaths = 0;
 		damageTaken = 0;
@@ -237,12 +239,18 @@ public class ClanFightPerformanceTrackerPlugin extends Plugin {
 				endingKills = client.getVarbitValue(8376); // So store this on each tick in case someone exits pvp zone
 			}
 		}
+
+		// If someone turns the plugin ON while already logged in in wilderness we should set starting KDR just once
+		if (usingRSKDR && !startingSet && client.getVarbitValue(8376) != 0 && startingKills == 0) {
+			startingKills = client.getVarbitValue(8376);
+			startingSet = true;
+		}
 	}
 
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event) {
 		if (event.getVarbitId() == 8376) {
-			if (startingKills == 0 && usingRSKDR) { // KDR is '0' when outside pvp, if someone enters pvp zone grab their kill count
+			if (startingKills == 0 && usingRSKDR && client.getVarbitValue(8376) != 0) { // KDR is '0' when outside pvp, if someone enters pvp zone grab their kill count
 				startingKills = client.getVarbitValue(8376); // and it can never be unset by leaving pvp
 			}
 		}
